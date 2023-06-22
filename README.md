@@ -7,6 +7,9 @@ A guide for using this repo to spin up a Kubernetes cluster is available at [Ins
 - ansible 192.168.1.22
 - master  192.168.1.21
 - node01  192.168.1.23
+  
+* vim /etc/fstab 
+(#/swap.img      none    swap    sw      0       0)
 
 
 # Features
