@@ -3,47 +3,34 @@ An Ansible playbook that installs Kubernetes.
 
 A guide for using this repo to spin up a Kubernetes cluster is available at [Installing your Kubernetes homelab cluster in minutes with Ansible](https://perdue.dev/installing-your-kubernetes-homelab-cluster-in-minutes-with-ansible/)
 
-#
-ansible 192.168.1.22
-master  192.168.1.21
-node01  192.168.1.23
+# ips
+- ansible 192.168.1.22
+- master  192.168.1.21
+- node01  192.168.1.23
 
 
 # Features
 - containerd
 - calico for pod networking
 
-#
-- ubuntu 'to access as a root '
-(Apply on Master and Worker Nodes )
+# Important
+- ubuntu ' to access as a root ' , (Apply on Master and Worker Nodes )
+    - vim /etc/ssh/sshd-config
 
-vim /etc/ssh/sshd-config
+        - 1) FROM: #PermitRootLogin prohibit-password ==> TO: PermitRootLogin yes
 
-1)
+        - 2) sudo systemctl restart ssh
 
-FROM:
-#PermitRootLogin prohibit-password
-TO:
-PermitRootLogin yes
+        - 3) sudo passwd " change password "
 
-2) sudo systemctl restart ssh
+- (Apply on Ansible )
+    - ssh-keygen
+    - ssh-copy-id root@ip-master
+    - ssh-copy-id root@ip-worker
 
-3)
-
-sudo passwd
-[sudo] password for linuxconfig:
-Enter new UNIX password:
-Retype new UNIX password:
-passwd: password updated successfully
-
-(Apply on Ansible )
-- ssh-keygen
-ssh-copy-id root@ip-master
-ssh-copy-id root@ip-worker
-
-(Apply on Master )
-- ssh-keygen
-ssh-copy-id root@ip-worker
+- (Apply on Master )
+    - ssh-keygen
+    - ssh-copy-id root@ip-worker
 
 
 # Quickstart
