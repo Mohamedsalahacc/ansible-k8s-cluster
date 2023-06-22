@@ -1,0 +1,37 @@
+- name: reset kubernetes component
+  shell: "kubeadm reset --force --cri-socket=/var/run/{{ container_runtime }}/{{ container_runtime }}.sock"
+  become: true
+  register: reset_cluster
+
+- name: init kubernetes cluster
+  when: reset_cluster is succeeded
+  shell: |
+    kubeadm init --service-cidr {{ service_cidr }} \
+                --kubernetes-version {{ kube_version }} \
+                --pod-network-cidr {{ pod_network_cidr }} \
+                --apiserver-advertise-address {{ control_plane_ip }} \
+                --cri-socket /var/run/{{ container_runtime }}/{{ container_runtime }}.sock \
+                {{ kubeadm_opts }} \
+                {{ init_opts }}
+  become: true
+  register: init_cluster
+
+
+
+- name: copy admin.conf to user home directory
+  copy:
+    src: "/etc/kubernetes/admin.conf"
+    dest: ".kube/config"
+      #    owner: "{{ ansible_user | default(ansible_user_id) }}"
+      # group: "{{ group | default(ansible_user_id) }}"
+    mode: 0755
+    remote_src: yes
+  become: true
+
+- name: copying config file to workers
+  shell: scp /etc/kubernetes/admin.conf root@192.168.1.23:.kube/config  
+
+
+- name: install pod network
+  shell: kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/calico.yaml
+
